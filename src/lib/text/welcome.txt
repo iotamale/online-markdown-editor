@@ -1,0 +1,36 @@
+# Online Markdown Editor 
+Just write in markdown and see what it looks like as you type. 
+- The data is not sent to any server - everything is compiled on your client. 
+- The editor automatically saves what you write locally for future use. If using a public computer, either empty the left panel before leaving the editor or use your browser's privacy mode
+
+### Code Example
+
+Here's some inline `code` and a code block:
+
+```javascript
+function hello() {
+    console.log("Hello, World!");
+}
+```
+
+### Lists
+
+- Item 1
+- Item 2
+- Item 3
+
+1. First item
+2. Second item
+3. Third item
+
+### Links and Images
+
+[Visit GitHub Repository](https://github.com/iotamale/online-markdown-editor)
+
+> Once upon a time...
+
+![Barack Obama](src/lib/images/obama.jpg)
+
+---
+
+That's all folks!
