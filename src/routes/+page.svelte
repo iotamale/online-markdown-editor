@@ -123,17 +123,20 @@
 		</p>
 
 		<p style="margin-left:auto;">
-			<button
-				on:click={() => (markdownInput = welcomeText)}
-				style="background:#fff;color:#408be0;border:none;padding:0.3em 0.8em;border-radius:4px;cursor:pointer;"
-			>
-				Reset input
-			</button>
+			<button on:click={() => (markdownInput = welcomeText)}> Reset input </button>
 		</p>
 	</footer>
 </div>
 
 <style>
+	button {
+		background: #fff;
+		color: #408be0;
+		border: none;
+		padding: 0.3em 0.8em;
+		border-radius: 4px;
+		cursor: pointer;
+	}
 	.page-container {
 		display: flex;
 		flex-direction: column;
