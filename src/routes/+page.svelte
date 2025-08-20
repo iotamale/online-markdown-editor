@@ -74,6 +74,19 @@
 		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('mouseup', handleMouseUp);
 	}
+
+	async function copyText(content: string | Promise<string>) {
+		if (navigator.clipboard && window.isSecureContext) {
+			try {
+				await navigator.clipboard.writeText(await content);
+				return true;
+			} catch (error) {
+				console.error('Clipboard write failed:', error);
+				return false;
+			}
+		}
+		return false;
+	}
 </script>
 
 <svelte:head>
@@ -106,25 +119,35 @@
 	</div>
 
 	<footer>
-		<p>
-			Created by <a href="https://github.com/iotamale/online-markdown-editor">iotamale</a>
-		</p>
-		<p>
-			<strong>{markdownInput.length + 1}</strong> bytes
-		</p>
-		<p>
-			<strong>{wordCount}</strong> words
-		</p>
-		<p>
-			<strong>{lineCount}</strong> lines
-		</p>
-		<p>
-			<strong>Ln {cursorLine}, Col {cursorColumn}</strong>
-		</p>
+		<div class="footer-left">
+			<p>
+				Created by <a href="https://github.com/iotamale/online-markdown-editor">iotamale</a>
+			</p>
+			<p>
+				<strong>{markdownInput.length + 1}</strong> bytes
+			</p>
+			<p>
+				<strong>{wordCount}</strong> words
+			</p>
+			<p>
+				<strong>{lineCount}</strong> lines
+			</p>
+			<p>
+				<strong>Ln {cursorLine}, Col {cursorColumn}</strong>
+			</p>
+		</div>
 
-		<p style="margin-left:auto;">
-			<button on:click={() => (markdownInput = welcomeText)}> Reset input </button>
-		</p>
+		<div class="footer-right">
+			<p>
+				<button on:click={() => copyText(markdownInput)}> Copy markdown </button>
+			</p>
+			<p>
+				<button on:click={() => copyText(htmlOutput)}> Copy HTML </button>
+			</p>
+			<p>
+				<button on:click={() => (markdownInput = welcomeText)}> Reset input </button>
+			</p>
+		</div>
 	</footer>
 </div>
 
@@ -136,11 +159,42 @@
 		padding: 0.3em 0.8em;
 		border-radius: 4px;
 		cursor: pointer;
+		transition: all 0.15s ease;
+		transform: scale(1);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
+
+	button:hover {
+		background: #f0f8ff;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	}
+
+	button:active {
+		transform: scale(0.95) translateY(0);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+		transition: all 0.1s ease;
+	}
+
 	.page-container {
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
+	}
+
+	.footer-left {
+		display: flex;
+		flex-direction: row;
+		justify-content: left;
+		align-items: center;
+	}
+
+	.footer-right {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		align-items: center;
+		padding: auto;
 	}
 
 	.editor-container {
@@ -157,8 +211,8 @@
 		color: #fff;
 		display: flex;
 		flex-direction: row;
-		justify-content: left;
-		align-items: left;
+		justify-content: space-between;
+		align-items: center;
 		padding: 0;
 		margin: 0;
 	}
