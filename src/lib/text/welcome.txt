@@ -29,8 +29,6 @@ function hello() {
 
 > Once upon a time...
 
-![Barack Obama](src/lib/images/obama.jpg)
-
 ---
 
 That's all folks!
