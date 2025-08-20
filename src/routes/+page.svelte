@@ -1,10 +1,19 @@
 <script lang="ts">
-	let markdownInput = `This is a simple online Markdown editor.
-# Funny text goes here`;
+	import { marked } from 'marked';
+
+	import welcomeText from '../lib/text/welcome.txt?raw';
+	let markdownInput = welcomeText;
 
 	let leftPaneWidth = 50; // percentage
 	let isDragging = false;
 	let editorContainer: HTMLElement;
+
+	marked.setOptions({
+		breaks: true,
+		gfm: true,
+	});
+
+	$: htmlOutput = marked(markdownInput);
 
 	function handleMouseDown(event: MouseEvent) {
 		isDragging = true;
@@ -44,7 +53,9 @@
 	</div>
 
 	<div class="preview-pane" style="width: {100 - leftPaneWidth}%">
-		<div class="preview-content">Text will be rendered here</div>
+		<div class="preview-content">
+			{@html htmlOutput}
+		</div>
 	</div>
 </div>
 
@@ -113,7 +124,7 @@
 		padding: 20px;
 		border: none;
 		outline: none;
-		font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+		/* font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; */
 		font-size: 14px;
 		line-height: 1.6;
 		resize: none;
@@ -129,15 +140,16 @@
 		color: #333;
 	}
 
-	.preview-content h1 {
+	.preview-content :global(h1) {
 		font-size: 2em;
 		font-weight: 600;
 		margin: 0.67em 0;
 		padding-bottom: 0.3em;
 		border-bottom: 1px solid #eaecef;
+		text-align: left;
 	}
 
-	.preview-content h2 {
+	.preview-content :global(h2) {
 		font-size: 1.5em;
 		font-weight: 600;
 		margin: 0.83em 0;
@@ -145,11 +157,99 @@
 		border-bottom: 1px solid #eaecef;
 	}
 
-	.preview-content p {
+	.preview-content :global(h3) {
+		font-size: 1.25em;
+		font-weight: 600;
 		margin: 1em 0;
 	}
 
-	.preview-content strong {
+	.preview-content :global(p) {
+		margin: 1em 0;
+	}
+
+	.preview-content :global(strong) {
+		font-weight: 600;
+	}
+
+	.preview-content :global(em) {
+		font-style: italic;
+	}
+
+	.preview-content :global(code) {
+		background-color: rgba(175, 184, 193, 0.2);
+		padding: 0.2em 0.4em;
+		border-radius: 3px;
+		font-family: var(--font-mono);
+		font-size: 0.85em;
+	}
+
+	.preview-content :global(pre) {
+		background-color: #f6f8fa;
+		border-radius: 6px;
+		padding: 16px;
+		overflow: auto;
+		margin: 1em 0;
+	}
+
+	.preview-content :global(pre code) {
+		background-color: transparent;
+		padding: 0;
+		font-family: var(--font-mono);
+	}
+
+	.preview-content :global(ul),
+	.preview-content :global(ol) {
+		margin: 1em 0;
+		padding-left: 2em;
+	}
+
+	.preview-content :global(li) {
+		margin: 0.5em 0;
+	}
+
+	.preview-content :global(blockquote) {
+		border-left: 4px solid #ddd;
+		margin: 1em 0;
+		padding: 0 1em;
+		color: #666;
+		font-style: italic;
+	}
+
+	.preview-content :global(hr) {
+		border: none;
+		border-top: 1px solid #eaecef;
+		margin: 2em 0;
+	}
+
+	.preview-content :global(a) {
+		color: #0366d6;
+		text-decoration: none;
+	}
+
+	.preview-content :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	.preview-content :global(img) {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.preview-content :global(table) {
+		border-collapse: collapse;
+		margin: 1em 0;
+		width: 100%;
+	}
+
+	.preview-content :global(th),
+	.preview-content :global(td) {
+		border: 1px solid #ddd;
+		padding: 8px 12px;
+		text-align: left;
+	}
+
+	.preview-content :global(th) {
+		background-color: #f6f8fa;
 		font-weight: 600;
 	}
 
