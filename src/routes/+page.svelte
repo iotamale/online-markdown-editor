@@ -7,6 +7,11 @@
 	let leftPaneWidth = 50; // percentage
 	let isDragging = false;
 	let editorContainer: HTMLElement;
+	let wordCount, lineCount;
+
+	let textareaElement: HTMLTextAreaElement;
+	let cursorLine = 1,
+		cursorColumn = 1;
 
 	marked.setOptions({
 		breaks: true,
@@ -14,12 +19,25 @@
 	});
 
 	$: htmlOutput = marked(markdownInput);
+	$: wordCount = markdownInput.split(/\s+/).filter(Boolean).length;
+	$: lineCount = markdownInput.split('\n').length;
 
 	function handleMouseDown(event: MouseEvent) {
 		isDragging = true;
 		event.preventDefault();
 		document.addEventListener('mousemove', handleMouseMove);
 		document.addEventListener('mouseup', handleMouseUp);
+	}
+
+	function updateCursorPosition() {
+		if (!textareaElement) return;
+		const cursorPos = textareaElement.selectionStart;
+		const textBeforeCursor = markdownInput.substring(0, cursorPos);
+
+		cursorLine = textBeforeCursor.split('\n').length;
+
+		const lastNewlineIndex = textBeforeCursor.lastIndexOf('\n');
+		cursorColumn = cursorPos - lastNewlineIndex;
 	}
 
 	function handleMouseMove(event: MouseEvent) {
@@ -43,28 +61,91 @@
 	<meta name="description" content="Simple online markdown editor" />
 </svelte:head>
 
-<div class="editor-container" bind:this={editorContainer}>
-	<div class="editor-pane" style="width: {leftPaneWidth}%">
-		<textarea bind:value={markdownInput} class="markdown-input"></textarea>
-	</div>
+<div class="page-container">
+	<div class="editor-container" bind:this={editorContainer}>
+		<div class="editor-pane" style="width: {leftPaneWidth}%">
+			<textarea
+				bind:value={markdownInput}
+				bind:this={textareaElement}
+				on:click={updateCursorPosition}
+				on:keyup={updateCursorPosition}
+				on:keydown={updateCursorPosition}
+				class="markdown-input"
+			></textarea>
+		</div>
 
-	<div class="slider" on:mousedown={handleMouseDown} class:dragging={isDragging}>
-		<div class="slider-handle"></div>
-	</div>
+		<div class="slider" on:mousedown={handleMouseDown} class:dragging={isDragging}>
+			<div class="slider-handle"></div>
+		</div>
 
-	<div class="preview-pane" style="width: {100 - leftPaneWidth}%">
-		<div class="preview-content">
-			{@html htmlOutput}
+		<div class="preview-pane" style="width: {100 - leftPaneWidth}%">
+			<div class="preview-content">
+				{@html htmlOutput}
+			</div>
 		</div>
 	</div>
+
+	<footer>
+		<p>
+			Created by <a href="https://github.com/iotamale/online-markdown-editor">iotamale</a>
+		</p>
+		<p>
+			<strong>{markdownInput.length + 1}</strong> bytes
+		</p>
+		<p>
+			<strong>{wordCount}</strong> words
+		</p>
+		<p>
+			<strong>{lineCount}</strong> lines
+		</p>
+		<p>
+			<strong>Ln {cursorLine}, Col {cursorColumn}</strong>
+		</p>
+	</footer>
 </div>
 
 <style>
+	.page-container {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+	}
+
 	.editor-container {
 		display: flex;
-		height: 100vh;
+		flex: 1;
 		overflow: hidden;
 		user-select: none;
+	}
+
+	footer {
+		position: sticky;
+		bottom: 0;
+		background: #408be0;
+		color: #fff;
+		display: flex;
+		flex-direction: row;
+		justify-content: left;
+		align-items: left;
+		padding: 0;
+		margin: 0;
+	}
+
+	footer p {
+		margin: 0.25rem 0.5rem 0.25rem 0.25rem;
+		padding: 0;
+		font-size: 0.8rem;
+	}
+
+	footer p strong {
+		font-weight: bold;
+		color: #fff;
+	}
+
+	footer p a {
+		font-weight: bold;
+		text-decoration: underline;
+		color: #fff;
 	}
 
 	.editor-pane {
@@ -274,6 +355,12 @@
 		.preview-pane {
 			min-width: auto;
 			min-height: 200px;
+		}
+	}
+
+	@media (min-width: 480px) {
+		footer {
+			padding: 0;
 		}
 	}
 </style>
