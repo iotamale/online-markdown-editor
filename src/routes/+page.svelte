@@ -10,7 +10,8 @@
 	let wordCount, lineCount;
 
 	let textareaElement: HTMLTextAreaElement;
-	let cursorLine, cursorColumn;
+	let cursorLine = 1,
+		cursorColumn = 1;
 
 	marked.setOptions({
 		breaks: true,
@@ -98,7 +99,7 @@
 			<strong>{lineCount}</strong> lines
 		</p>
 		<p>
-			<strong>Ln {cursorLine || 1}, Col {cursorColumn || 1}</strong>
+			<strong>Ln {cursorLine}, Col {cursorColumn}</strong>
 		</p>
 	</footer>
 </div>
