@@ -1,8 +1,13 @@
 <script lang="ts">
 	import { marked } from 'marked';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	import welcomeText from '../lib/text/welcome.txt?raw';
-	let markdownInput = welcomeText;
+	let markdownInput = '';
+	let mounted = false;
+
+	const STORAGE_KEY = 'markdown-editor-content';
 
 	let leftPaneWidth = 50; // percentage
 	let isDragging = false;
@@ -12,6 +17,21 @@
 	let textareaElement: HTMLTextAreaElement;
 	let cursorLine = 1,
 		cursorColumn = 1;
+
+	// Load content from localStorage on mount
+	onMount(() => {
+		if (browser) {
+			const savedContent = localStorage.getItem(STORAGE_KEY);
+			if (savedContent) markdownInput = savedContent;
+			else markdownInput = welcomeText;
+		}
+		mounted = true;
+	});
+
+	// Save to localStorage whenever content changes
+	$: if (browser && mounted) {
+		localStorage.setItem(STORAGE_KEY, markdownInput);
+	}
 
 	marked.setOptions({
 		breaks: true,
@@ -101,10 +121,22 @@
 		<p>
 			<strong>Ln {cursorLine}, Col {cursorColumn}</strong>
 		</p>
+
+		<p style="margin-left:auto;">
+			<button on:click={() => (markdownInput = welcomeText)}> Reset input </button>
+		</p>
 	</footer>
 </div>
 
 <style>
+	button {
+		background: #fff;
+		color: #408be0;
+		border: none;
+		padding: 0.3em 0.8em;
+		border-radius: 4px;
+		cursor: pointer;
+	}
 	.page-container {
 		display: flex;
 		flex-direction: column;
