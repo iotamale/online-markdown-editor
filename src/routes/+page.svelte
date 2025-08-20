@@ -2,6 +2,7 @@
 	import { marked } from 'marked';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { copyText, saveToPDF } from './helpers';
 
 	import welcomeText from '../lib/text/welcome.txt?raw';
 	let markdownInput = '';
@@ -18,7 +19,6 @@
 	let cursorLine = 1,
 		cursorColumn = 1;
 
-	// Load content from localStorage on mount
 	onMount(() => {
 		if (browser) {
 			const savedContent = localStorage.getItem(STORAGE_KEY);
@@ -28,16 +28,14 @@
 		mounted = true;
 	});
 
-	// Save to localStorage whenever content changes
-	$: if (browser && mounted) {
-		localStorage.setItem(STORAGE_KEY, markdownInput);
-	}
-
 	marked.setOptions({
 		breaks: true,
 		gfm: true,
 	});
 
+	$: if (browser && mounted) {
+		localStorage.setItem(STORAGE_KEY, markdownInput);
+	}
 	$: htmlOutput = marked(markdownInput);
 	$: wordCount = markdownInput.split(/\s+/).filter(Boolean).length;
 	$: lineCount = markdownInput.split('\n').length;
@@ -73,19 +71,6 @@
 		isDragging = false;
 		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('mouseup', handleMouseUp);
-	}
-
-	async function copyText(content: string | Promise<string>) {
-		if (navigator.clipboard && window.isSecureContext) {
-			try {
-				await navigator.clipboard.writeText(await content);
-				return true;
-			} catch (error) {
-				console.error('Clipboard write failed:', error);
-				return false;
-			}
-		}
-		return false;
 	}
 </script>
 
@@ -146,6 +131,9 @@
 			</p>
 			<p>
 				<button on:click={() => (markdownInput = welcomeText)}> Reset input </button>
+			</p>
+			<p>
+				<button on:click={() => saveToPDF(htmlOutput)}> Save as PDF </button>
 			</p>
 		</div>
 	</footer>
